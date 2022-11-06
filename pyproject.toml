@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "dm data visualization dashboard"
+version = "0.1.0"
+description = "Visualization of [Housing Price in Beijing dataset](https://www.kaggle.com/datasets/ruiqurm/lianjia) from Kaggle"
+authors = ["Sambeg Shrestha <sthasam2@gmail.com>"]
+license = "GNU v3"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pandas = "^1.5.1"
+seaborn = "^0.12.1"
+matplotlib = "^3.6.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
