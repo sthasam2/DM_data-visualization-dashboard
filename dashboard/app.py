@@ -1,19 +1,9 @@
+import dash_bootstrap_components as dbc
 import pandas as pd
 import plotly.express as px
-import dash_bootstrap_components as dbc
-from dash import Dash, Input, Output, dash_table, dcc, html
+from dash import Dash, Input, Output, dcc, html
 
-from components import (
-    df,
-    data_summary,
-    time_price_scatter,
-    time_series_avg_price,
-    pie_chart,
-    avg_total_district_bar,
-    beijing_scatter_mapbox,
-    square_histogram,
-    building_str_price_bar_graph,
-)
+from components import *
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.CERULEAN])
 app.title = "Visualization of Beijing Housing Data"
@@ -33,10 +23,9 @@ def update_bar_chart(slider_range):
         y="tradeTime",
         x="totalPrice",
         color="totalPrice",
-        title="Trade Time vs Total Price Scatter Plot",
         size="totalPrice",
     )
-    fig.update_layout(plot_bgcolor="rgb(45, 45, 45)", height=800)
+    fig.update_layout(plot_bgcolor=BG_COLOR, height=SUBPLOT_HEIGHT)
     return fig
 
 
@@ -54,7 +43,9 @@ def generate_chart(names):
 #########################
 
 app.layout = dbc.Container(
+    style={"padding": "50px", "max-width": "100vw"},
     id="dashboard",
+    fluid=True,
     children=[
         html.Div(
             html.H1("Beijing Housing Data Visualization"),
@@ -62,70 +53,70 @@ app.layout = dbc.Container(
                 "text-align": "center",
             },
         ),
-        # html.Div(
-        #     html.H2("Data Table Summary"),
-        #     style={
-        #         "text-align": "center",
-        #         "padding": "100px 40px 0 40px",
-        #     },
-        # ),
-        data_summary,
-        html.Div(
-            html.H2("Time vs Total Price Scatter"),
-            style={
-                "text-align": "center",
-                "padding": "100px 40px 0 40px",
-            },
+        # ROW 1
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        h2_title("Time vs Total Price: Scatter"),
+                        time_price_scatter,
+                    ],
+                    width=6,
+                ),
+                dbc.Col(
+                    [
+                        h2_title("Total Price: Scatter Map"),
+                        dcc.Graph(figure=beijing_scatter_mapbox),
+                    ],
+                    width=6,
+                ),
+            ]
         ),
-        time_price_scatter,
-        html.Div(
-            html.H2("Average Prices over Time"),
-            style={
-                "text-align": "center",
-                "padding": "100px 40px 0 40px",
-            },
+        # ROW 2
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        h2_title("Average Prices over Time"),
+                        dcc.Graph(figure=time_series_avg_price),
+                    ],
+                    width=6,
+                ),
+                dbc.Col(
+                    [
+                        h2_title("Housing Features: Donut Chart"),
+                        pie_chart,
+                    ],
+                    width=6,
+                ),
+            ]
         ),
-        dcc.Graph(figure=time_series_avg_price),
-        html.Div(
-            html.H2("Total Price in Beijing Scatter"),
-            style={
-                "text-align": "center",
-                "padding": "100px 40px 0 40px",
-            },
+        # ROW 3
+        dbc.Row(
+            [
+                dbc.Col(
+                    [
+                        h2_title("Average Total Price by Districts"),
+                        dcc.Graph(figure=avg_total_district_bar),
+                    ],
+                    width=6,
+                ),
+                dbc.Col(
+                    [
+                        h2_title("Average Total Price by Building Structure"),
+                        dcc.Graph(figure=building_str_price_bar_graph),
+                    ],
+                    width=6,
+                ),
+            ]
         ),
-        dcc.Graph(figure=beijing_scatter_mapbox),
-        html.Div(
-            html.H2("Different Housing Features Pie Chart"),
-            style={
-                "text-align": "center",
-                "padding": "100px 40px 0 40px",
-            },
+        # ROW 4
+        dbc.Row(
+            [
+                h2_title("Area (m²) of Housing: Histogram"),
+                dcc.Graph(figure=square_histogram),
+            ]
         ),
-        pie_chart,
-        html.Div(
-            html.H2("Average Total Price in Districts"),
-            style={
-                "text-align": "center",
-                "padding": "100px 40px 0 40px",
-            },
-        ),
-        dcc.Graph(figure=avg_total_district_bar),
-        html.Div(
-            html.H2("Average Total Price per Building Structure"),
-            style={
-                "text-align": "center",
-                "padding": "100px 40px 0 40px",
-            },
-        ),
-        dcc.Graph(figure=building_str_price_bar_graph),
-        html.Div(
-            html.H2("Square m of Housing Histogram"),
-            style={
-                "text-align": "center",
-                "padding": "100px 40px 0 40px",
-            },
-        ),
-        dcc.Graph(figure=square_histogram),
     ],
 )
 

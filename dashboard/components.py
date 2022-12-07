@@ -1,84 +1,11 @@
-import pandas as pd
-import plotly.express as px
 import dash_bootstrap_components as dbc
-from dash import Dash, Input, Output, dash_table, dcc, html
+import plotly.express as px
+from dash import dcc, html
 
+from data import *
 
-#########################
-# DATA
-#########################
-
-# data frame
-
-df = pd.read_csv("../assets/cleaned.csv")
-df.drop(df[df["tradeYear"] < 2010].index, inplace=True)
-
-
-df["district"] = df["district"].replace(
-    {
-        1: "Dongcheng",
-        2: "Fengtai",
-        3: "Tongzhou",
-        4: "Daxing",
-        5: "Fangshan",
-        6: "Changping",
-        7: "Chaoyang",
-        8: "Haidian",
-        9: "Shijingshan",
-        10: "Xicheng",
-        11: "Pinggu",
-        12: "Mentougou",
-        13: "Shunyi",
-    }
-)
-df["buildingStructure"] = df["buildingStructure"].replace(
-    {
-        1: "unknown",
-        2: "mixed",
-        3: "brick and wood",
-        4: "brick and concrete",
-        5: "steel",
-        6: "steel-concrete composite",
-    }
-)
-df["buildingType"] = df["buildingType"].replace(
-    {
-        1: "tower",
-        2: "bungalow",
-        3: "combination of plate and tower",
-        4: "plate",
-    }
-)
-df["renovationCondition"] = df["renovationCondition"].replace(
-    {
-        1: "other",
-        2: "rough",
-        3: "Simplicity",
-        4: "hardcover",
-    }
-)
-df["elevator"] = df["elevator"].replace(
-    {
-        1: "yes",
-        0: "no",
-    }
-)
-
-# Scaling
-
-df["totalPrice"] = df["totalPrice"].apply(lambda x: x * 10000)
-
-# Average price every year and month
-
-average_price_df = (
-    df.groupby(["tradeYear", "tradeMonth"])["totalPrice"].mean().reset_index()
-)
-average_price_df["tradeTime"] = [
-    f"{x}-{y}" for x, y in zip(average_price_df.tradeYear, average_price_df.tradeMonth)
-]
-
-avg_district = df.groupby(["district"])["totalPrice"].mean()
-building_str = df.groupby(["buildingStructure"])["totalPrice"].mean()
+SUBPLOT_HEIGHT = 700
+BG_COLOR = "#d7e1ee"
 
 
 #########################
@@ -101,7 +28,6 @@ data_summary = html.Div(
 time_price_scatter = html.Div(
     [
         dcc.Graph(id="scatter-plot"),
-        html.P("Filter by total price"),
         dcc.RangeSlider(
             id="range-slider",
             min=500000,
@@ -116,13 +42,9 @@ time_series_avg_price = px.line(
     average_price_df,
     x="tradeTime",
     y="totalPrice",
-    title="Average Annual Price",
-    height=800,
+    height=SUBPLOT_HEIGHT,
 )
-time_series_avg_price.update_layout(
-    plot_bgcolor="rgb(45, 45, 45)",
-)
-time_series_avg_price.update_xaxes(
+time_series_avg_price.update_layout(plot_bgcolor=BG_COLOR,).update_xaxes(
     rangeslider_visible=True,
     rangeselector=dict(
         buttons=list(
@@ -141,7 +63,6 @@ time_series_avg_price.update_xaxes(
 
 pie_chart = html.Div(
     [
-        dcc.Graph(id="pie"),
         html.P("Category"),
         dcc.Dropdown(
             id="names",
@@ -160,6 +81,7 @@ pie_chart = html.Div(
             value="livingRoom",
             clearable=False,
         ),
+        dcc.Graph(id="pie", style={"height": f"{SUBPLOT_HEIGHT}px"}),
     ]
 )
 
@@ -178,8 +100,7 @@ avg_total_district_bar = (
     .update_yaxes(showgrid=False)
 )
 avg_total_district_bar.update_layout(
-    plot_bgcolor="rgb(45, 45, 45)",
-    title_text="Average Total Price by Districts",
+    plot_bgcolor=BG_COLOR,
     title_x=0.5,
 )
 
@@ -194,23 +115,21 @@ beijing_scatter_mapbox = px.scatter_mapbox(
     color="price",
     size="totalPrice",
     color_continuous_scale=px.colors.cyclical.IceFire,
-    width=1200,
-    height=900,
-    title="Scatter Map of the houses by price",
+    # width=1200,
+    height=SUBPLOT_HEIGHT,
 )
-
-beijing_scatter_mapbox.update_layout(mapbox_style="open-street-map")
-beijing_scatter_mapbox.update_layout(margin={"r": 50, "t": 50, "l": 100, "b": 10})
+beijing_scatter_mapbox.update_layout(
+    mapbox_style="open-street-map",
+    margin={"r": 50, "t": 50, "l": 100, "b": 10},
+)
 
 
 # Histogram of square feet of housing
 
 square_histogram = px.histogram(df, x="square", range_x=[0, 300])
-square_histogram.update_layout(
-    plot_bgcolor="rgb(45, 45, 45)",
-    title_text="Histogram of square feet of housing",
-    title_x=0.5,
-).update_yaxes(showgrid=False)
+square_histogram.update_layout(plot_bgcolor=BG_COLOR, title_x=0.5,).update_yaxes(
+    showgrid=False
+).update_traces(xbins=dict(size=5))
 
 
 # Bar Graph showing building structure and the price
@@ -227,7 +146,16 @@ building_str_price_bar_graph = (
     .update_yaxes(showgrid=False)
 )
 building_str_price_bar_graph.update_layout(
-    plot_bgcolor="rgb(45, 45, 45)",
-    title_text="Building structure vs price bar graph",
+    plot_bgcolor=BG_COLOR,
     title_x=0.5,
 )
+
+
+def h2_title(title: str):
+    return html.Div(
+        html.H2(title),
+        style={
+            "text-align": "center",
+            "padding": "100px 40px 0 40px",
+        },
+    )
