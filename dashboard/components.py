@@ -57,6 +57,12 @@ df["renovationCondition"] = df["renovationCondition"].replace(
         4: "hardcover",
     }
 )
+df["elevator"] = df["elevator"].replace(
+    {
+        1: "yes",
+        0: "no",
+    }
+)
 
 # Scaling
 
@@ -98,9 +104,9 @@ time_price_scatter = html.Div(
         html.P("Filter by total price"),
         dcc.RangeSlider(
             id="range-slider",
-            min=1000000,
+            min=500000,
             max=250000000,
-            value=[1000000, 20000000],
+            value=[500000, 20000000],
         ),
     ]
 )

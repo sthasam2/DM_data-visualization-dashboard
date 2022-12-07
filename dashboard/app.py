@@ -62,13 +62,13 @@ app.layout = dbc.Container(
                 "text-align": "center",
             },
         ),
-        html.Div(
-            html.H2("Data Table Summary"),
-            style={
-                "text-align": "center",
-                "padding": "100px 40px 0 40px",
-            },
-        ),
+        # html.Div(
+        #     html.H2("Data Table Summary"),
+        #     style={
+        #         "text-align": "center",
+        #         "padding": "100px 40px 0 40px",
+        #     },
+        # ),
         data_summary,
         html.Div(
             html.H2("Time vs Total Price Scatter"),
