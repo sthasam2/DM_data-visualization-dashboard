@@ -10,3 +10,11 @@ Visualization of [Housing Price in Beijing dataset](https://www.kaggle.com/datas
 - pandas 1.5.1 Powerful data structures for data analysis, time series, and statistics
 
 ## Running the Project
+
+```shell
+python dashboard/app.py
+```
+
+## Screenshot
+
+![alt](assets/dash.png)
